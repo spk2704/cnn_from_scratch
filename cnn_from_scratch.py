@@ -1,4 +1,5 @@
 #Basic CNN with ASL dataset
+#Download the dataset from https://www.kaggle.com/datasets/ayuraj/asl-dataset
 
 
 import torch
@@ -46,57 +47,54 @@ class CNN(nn.Module):
 model = CNN().to(device)
 
 
-# loss_fn = nn.CrossEntropyLoss()
-# optimizer = torch.optim.SGD(model.parameters(), lr=1e-3)
-# epochs = 20
+loss_fn = nn.CrossEntropyLoss()
+optimizer = torch.optim.SGD(model.parameters(), lr=1e-3)
+epochs = 20
 
-# def train(dataloader):
-#     model.train()
+def train(dataloader):
+    model.train()
 
-#     for x, y in dataloader:
-#         x, y = x.to(device), y.to(device)
+    for x, y in dataloader:
+        x, y = x.to(device), y.to(device)
 
-#         pred = model(x)
-#         loss = loss_fn(pred, y)
-#         loss.backward()
+        pred = model(x)
+        loss = loss_fn(pred, y)
+        loss.backward()
 
-#         optimizer.step()
-#         optimizer.zero_grad()
-
-
-# def test(dataloader):
-#     model.eval()
-
-#     size = len(dataloader.dataset)
-#     num_batches = len(dataloader)
-#     test_loss, correct = 0, 0
-
-#     with torch.no_grad():
-#         for x, y in dataloader:
-#             x, y = x.to(device), y.to(device)
-
-#             pred = model(x)
-#             loss = loss_fn(pred, y)
-#             test_loss += loss.item()
-#             correct += (pred.argmax(1) == y).type(torch.float).sum().item()
-
-#     test_loss /= num_batches
-#     correct /= size
-#     print(f"Test Error: \n Accuracy: {(100*correct):>0.1f}%, Avg loss: {test_loss:>8f} \n")
-
- 
-# for i in range(epochs):
-#     print(f"Epoch {i+1}\n-------------------------------")
-#     train(dataloader=train_dataloader)
-#     test(dataloader=test_dataloader)
-
-#     if (i == 19):
-#         torch.save(model.state_dict(), f"model.pth")
-# print("Done")
+        optimizer.step()
+        optimizer.zero_grad()
 
 
-model = CNN().to(device)
-model.load_state_dict(torch.load("cnn.pth", map_location=device, weights_only=True))
+def test(dataloader):
+    model.eval()
+
+    size = len(dataloader.dataset)
+    num_batches = len(dataloader)
+    test_loss, correct = 0, 0
+
+    with torch.no_grad():
+        for x, y in dataloader:
+            x, y = x.to(device), y.to(device)
+
+            pred = model(x)
+            loss = loss_fn(pred, y)
+            test_loss += loss.item()
+            correct += (pred.argmax(1) == y).type(torch.float).sum().item()
+
+    test_loss /= num_batches
+    correct /= size
+    print(f"Test Error: \n Accuracy: {(100*correct):>0.1f}%, Avg loss: {test_loss:>8f} \n")
+
+
+for i in range(epochs):
+    print(f"Epoch {i+1}\n-------------------------------")
+    train(dataloader=train_dataloader)
+    test(dataloader=test_dataloader)
+
+    if (i == 19):
+        torch.save(model.state_dict(), f"model.pth")
+print("Done")
+
 
 classes = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a",
     "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l",
